@@ -1,0 +1,50 @@
+
+
+
+
+body {
+background:  #d6d6c2;
+}
+table th{
+text-align: center;
+background: #c3c3a2;
+border-width: 5px;
+
+}
+table {
+background: #ebebe0;
+
+}
+
+
+table tr:hover {
+     background-color: #f5f5ef;
+     cursor: pointer;
+  }
+
+
+#wrapper {
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+  text-align: center;
+  padding: 30px 0;
+}
+
+label {
+  color:  #7a7a52;
+  font-size: 18px;
+  font-weight: normal;
+   margin-top: 10px;
+}
+
+.btn {
+  border: 0;
+  border-radius: 3px;
+  margin-top: 20px;
+  background:  #999966;
+}
+.form-group {
+  margin-bottom: 0;
+  text-align: left;
+}

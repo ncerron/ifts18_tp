@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block page_content %}
+
+    <div id="wrapper" class="container">
+
+        <h4> Lista de usuarios  </h4>
+       <div class="table-responsive">
+
+            <table class="table">
+                <tr>
+                 <th>Usuario</th><th>Login</th>
+                </tr>
+                {% for user in users %}
+                   <tr>
+                     <td>{{ user["usuario"]}}</td>
+                     <td>{{ user["login"] }}</td>
+                     </tr>
+                {% endfor %}
+
+             </table>
+    </div>
+
+        </div>
+{% endblock %}

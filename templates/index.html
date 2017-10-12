@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+ {% block page_content %}
+    <div id="wrapper" class="container">
+        <form method="POST" action="/index">
+        {{ form.csrf_token }}
+        <fieldset>
+        <legend><h4>Login</h4></legend>
+
+          <!--mensaje   -->
+        <div class="col-md-12" align="left">
+             {% if msj == "ok" %}
+                  <h4> <span class="label label-warning">Verifique login</span> </h4>
+             {% elif  msj == " " %}
+                  <h4> <span class="label label-warning">Usuario no encontrado</span> </h4>
+             {% endif %}
+        </div>
+
+            <!--usuario-->
+            <div class="form-group">
+            <div class="col-md-6">
+            <label class="control-label">{{ form.usu.label }}</label>
+               {{ form.usu(class="form-control") }}
+                 <br>
+                  {% for message in form.usu.errors %}
+
+                      {{ message }}
+                 {% endfor %}
+            </div>
+            </div>
+
+             <!--password-->
+            <div class="form-group">
+            <div class="col-md-6">
+            <label class="control-label">{{ form.passw.label }}</label>
+               {{ form.passw(class="form-control") }}
+               <br>
+               {% for message in form.passw.errors %}
+
+                      {{ message }}
+               {% endfor %}
+            </div>
+            </div>
+            <div class="form-group">
+            <div class="col-md-12">
+                 {{ form.submit(class="btn btn-lg btn-block")}}
+            </div>
+            </div>
+     </fieldset>
+   </form>
+</div>
+    {% endblock %}
