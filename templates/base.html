@@ -1,16 +1,11 @@
 {% extends "bootstrap/base.html" %}
-
 {% block head %}
 {{ super() }}
-
 <link rel="shortcut icon" href="{{ url_for('static', filename = 'favicon.png') }}" type="image/x-icon">
 <link rel="icon" href="{{ url_for('static', filename = 'favicon.png') }}" type="image/x-icon">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/estilo.css') }}">
-
 {% endblock %}
-
-{% block title %}Login{% endblock %}
-
+{% block title %}FarmaSoft{% endblock %}
 {% block navbar %}
 <div class="navbar navbar-inverse" role="navigation">
     <div class="container">
@@ -21,24 +16,30 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar" ></span>
             </button>
-            <a class="navbar-brand" ></a>
+            <span class="navbar-text" style="font-size: 18px;">FarmaSoft</span>
         </div>
         <div class="navbar-collapse collapse">
             <ul class="nav navbar-nav">
                 {%  if 'admin' == session['nombre'] %}
-                <li><a href="/index">Inicio</a></li>
-                <li><a href="/registro">Registro</a></li>
                 <li><a href="/users">Usuarios</a></li>
-
+                <li><a href="/ventas">Ultimas ventas</a></li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="http://example.com" id="dropdown01" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Consultas</a>
+                    <ul class="dropdown-menu" aria-labelledby="dropdown01">
+                        <li><a class="dropdown-item" href="/cliente">Clientes por Producto</a></li>
+                        <li><a class="dropdown-item" href="/producto">Productos por Cliente</a></li>
+                        <li><a class="dropdown-item" href="/mejores_clientes">Mejores Clientes</a></li>
+                        <li><a class="dropdown-item" href="/mas_vendidos">Productos más vendidos</a></li>
+                    </ul>
+                </li>
                 {% elif 'nombre' not in session %}
-                <li><a href="/registro">Registro</a></li>
-                <li><a href="/index">Inicio</a></li>
-                <li><a href="/clientes">Clientes</a></li>
+                    <li><a href="/registro">Registro</a></li>
+                    <li><a href="/login">Login</a></li>
                 {% endif %}
             </ul>
             <ul class="nav navbar-nav navbar-right">
                 {%  if 'nombre' in session %}
-                <li><a href="/bienvenido">Logout </a></li>
+                       <li><a href="/logout">Logout </a></li>
                 {% endif %}
             </ul>
 
@@ -46,10 +47,10 @@
     </div>
 </div>
 {% endblock %}
-
 {% block content %}
 <div class="container">
-    {% block page_content %}{% endblock %}
+    {% block page_content %}
+    {% endblock %}
 </div>
 {% endblock %}
 
