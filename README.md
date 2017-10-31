@@ -1,6 +1,6 @@
 Estructura de Datos - Parcial
 
-#Informe
+#  Informe
 
 
 Se desarrolla modulo de consulta de la aplicación web, módulo registración y módulo login. Al ingresar a la aplicacion se mostrará una página de bienvenida,  para ingresar al sistema habrá que loguearse, si no se encuentra registrado, tiene la opción de hacerlo a través de la barra de navegación.                                                                                                                  
