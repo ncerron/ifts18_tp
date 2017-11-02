@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+
  {% block page_content %}
 <div id="wrapper" class="container">
     <form method="POST" action="/login">
@@ -12,6 +13,11 @@
                 {% elif  msj == "mal" %}
                 <h4> <span class="label label-warning">Usuario no encontrado</span> </h4>
                 {% endif %}
+                {% with messages = get_flashed_messages() %}
+                    {% for message in messages %}
+                  <span style="color:goldenrod;font-weight: bold; "> {{ message }} </span>
+                    {% endfor %}
+                {% endwith %}
             </div>
             <!--usuario-->
             <div class="form-group">

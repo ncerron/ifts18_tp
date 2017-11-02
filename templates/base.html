@@ -4,6 +4,7 @@
 <link rel="shortcut icon" href="{{ url_for('static', filename = 'favicon.png') }}" type="image/x-icon">
 <link rel="icon" href="{{ url_for('static', filename = 'favicon.png') }}" type="image/x-icon">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/estilo.css') }}">
+
 {% endblock %}
 {% block title %}FarmaSoft{% endblock %}
 {% block navbar %}
@@ -16,7 +17,7 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar" ></span>
             </button>
-            <span class="navbar-text" style="font-size: 18px;">FarmaSoft</span>
+            <span class="navbar-text" style="font-size: 18px;"> FarmaSoft</span>
         </div>
         <div class="navbar-collapse collapse">
             <ul class="nav navbar-nav">
@@ -26,23 +27,22 @@
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="http://example.com" id="dropdown01" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Consultas</a>
                     <ul class="dropdown-menu" aria-labelledby="dropdown01">
-                        <li><a class="dropdown-item" href="/cliente">Clientes por Producto</a></li>
-                        <li><a class="dropdown-item" href="/producto">Productos por Cliente</a></li>
+                        <li><a class="dropdown-item" href="/cliente">Producto por Cliente</a></li>
+                        <li><a class="dropdown-item" href="/producto">Cliente por Producto</a></li>
                         <li><a class="dropdown-item" href="/mejores_clientes">Mejores Clientes</a></li>
                         <li><a class="dropdown-item" href="/mas_vendidos">Productos más vendidos</a></li>
                     </ul>
                 </li>
                 {% elif 'nombre' not in session %}
-                    <li><a href="/registro">Registro</a></li>
-                    <li><a href="/login">Login</a></li>
+                <li><a href="/login">Login</a></li>
+                <li><a href="/registro">Registro</a></li>
                 {% endif %}
-            </ul>
-            <ul class="nav navbar-nav navbar-right">
-                {%  if 'nombre' in session %}
-                       <li><a href="/logout">Logout </a></li>
-                {% endif %}
-            </ul>
-
+                </ul>
+                <ul class="nav navbar-nav navbar-right">
+                    {%  if 'nombre' in session %}
+                    <li><a href="/logout">Logout </a></li>
+                    {% endif %}
+                </ul>
         </div>
     </div>
 </div>
@@ -54,5 +54,8 @@
 </div>
 {% endblock %}
 
+{% block scripts %}
+{{ super() }}
 
+{% endblock %}
 

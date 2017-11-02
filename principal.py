@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 from flask_bootstrap import Bootstrap
-from flask import Flask, render_template,session, redirect, url_for, request
+from flask import Flask, render_template,session, redirect, url_for, request, flash
 from formulario import MyLogin, MyRegistro, MyConsultaCliente, MyConsultaProducto, MyConsulta
 import archivo
 
@@ -8,19 +8,24 @@ app = Flask(__name__)
 app.config["SECRET_KEY"] = "String dificil de adivinar"
 bootstrap = Bootstrap(app)
 
-@app.route('/logout')
+@app.route("/logout")
 def logout():
     """funcion para salir de la sesion generada al ingresar a traves de la pagina login"""
     session.pop('nombre', None)
     return redirect(url_for('index'))
 
-@app.route('/users', methods = ('GET', 'POST'))
+
+@app.route("/users", methods = ('GET', 'POST'))
 def user():
     """listado de usuarios creados, solo se puede ver si el usuario que ingreso a la sesion es admin"""
-    users = archivo.leer("archivos_csv/passws.csv")
-    return render_template('users.html', users = users)
+    if session.get("nombre"):
+        users = archivo.leer("archivos_csv/passws.csv")
+        return render_template('users.html', users = users)
+    flash('Debe estar logueado para acceder')
+    return redirect(url_for('login'))
 
-@app.route('/login', methods = ('GET', 'POST'))
+
+@app.route("/login", methods = ('GET', 'POST'))
 def login():
     """Aqui se realiza el logueo del usuario, se valida si el usuario se encuentra registrado comparando los datos
      ingresados en la pagina con con los datos de usuarios registrados que contiene el archivo passws.csv, esta info es
@@ -32,11 +37,9 @@ def login():
         for l in user2:
             if l['usuario'] == form2.usu.data.strip():
                 if l['login'] == form2.passw.data.strip():
-                    session['nombre'] = form2.usu.data.strip()
+                    session["nombre"] = form2.usu.data.strip()
                     ## se establece un nombre a la sesion
-                    nombre=session['nombre']
-                    ## asignamos a la variable nombre la sesion
-                    if nombre == "admin":
+                    if session["nombre"] == "admin":
                         return redirect(url_for('ventas'))
                     else:
                         return redirect(url_for('usuario'))
@@ -44,20 +47,23 @@ def login():
                     form2.passw.data = ""
                     # a traves de la variable msj, en html se informa que se verifique la contraseña
                     return render_template('login.html', form = form2, msj = "ok")
-
         form2.passw.data = ""
         form2.usu.data = ""
          ##a traves de la variable msj, en html se informa usuario no encontrado
-        return render_template('login.html', form=form2, msj="mal")
-    return render_template('login.html', form = form2)
+        return render_template("login.html", form=form2, msj="mal")
+    return render_template("login.html", form = form2)
 
-@app.route('/')
-@app.route('/index', methods = ('GET', 'POST'))
+
+@app.route("/")
+@app.route("/index", methods = ('GET', 'POST'))
 def index():
     """pagina de bienvenida al iniciar la aplicacion"""
-    return render_template('index.html')
+    if not session.get("nombre"):
+       return render_template('index.html')
+    return redirect(url_for('login'))
 
-@app.route('/registro', methods = ('GET', 'POST'))
+
+@app.route("/registro", methods = ('GET', 'POST'))
 def registro():
     """Aqui se realiza la registracion de nuevos usuarios, se valida si el usuario se encuentra registrado comparando
     los datos ingresados en la pagina con con los datos de usuarios registrados que contiene el archivo passws.csv, esta
@@ -96,102 +102,114 @@ def registro():
             return render_template('registro.html', form=form, msj="pass")
     return render_template('registro.html', form  = form)
 
-@app.route('/ventas')
+
+@app.route("/ventas")
 def ventas():
     """Pagina de bienvenida para el usuario logueado admnin"""
-    usuario = session['nombre']
-    f_rta = archivo.validar("archivos_csv/archivo.csv")
-    if f_rta:
+    if session.get("nombre"):
         clientes = archivo.leer("archivos_csv/archivo.csv")
         ## se valida el archivo, si fue exitosa, a traves de ff se muestra la info de la variable clientes
-        return render_template('ventas.html', clientes = clientes, usuario = usuario, ff = True)
-    else:
-        return render_template('ventas.html', ff = False, msg = "el archivo no se puede procesar")
+        return render_template('ventas.html', clientes = clientes, usuario = session.get('nombre'), ff = True)
+    flash('Debe estar logueado para acceder')
+    return redirect(url_for('login'))
 
-@app.route('/usuario')
+
+@app.route("/usuario")
 def usuario():
     """Pagina de bienvenida para el usuario logueado que NO es admin"""
     usuario = session['nombre']
     return render_template('usuario.html', usuario = usuario)
 
-@app.route('/cliente', methods = ('GET', 'POST'))
+
+@app.route("/cliente", methods = ('GET', 'POST'))
 def cliente():
     """Funciona junto con la pagina mostrar para listar todos los productos que compro un cliente, en esta pagina el
     usuario debe ingresar 3 caracteres que componen el nombre del cliente a buscar, como resultado se obtendra una lista
     de posibles clientes, en la cual el usuario debe elegir uno de ellos, y al clickear el boton seleccionar se
     redireccionara a la pagina mostrar, en donde se visualizara el listado"""
-    form = MyConsultaCliente()
-    lista_busqueda = archivo.lista_clientes("archivos_csv/archivo.csv")
-    ff = False
-    msg = ""
-    if form.validate_on_submit():
-        lista = []
-        if form.cliente.data != None:
-            for palabra in lista_busqueda:
-                if form.cliente.data.upper() in palabra:
-                    lista.append(palabra)
-            if len(lista) != 0:
-                ff = True
-            else:
-                ff = False
-                msg = "No se encontro nombre del cliente"
-                # ff habilita la visualizacion del contenido de la variable lista
-            return render_template('cliente.html', form = form, lista = lista, msg = msg , ff = ff)
-    return render_template('cliente.html', form = form, ff = False)
+    if session.get("nombre"):
+        form = MyConsultaCliente()
+        lista_busqueda = archivo.lista_clientes("archivos_csv/archivo.csv")
+        ff = False
+        msg = ""
+        if form.validate_on_submit():
+            lista = []
+            if form.cliente.data != None:
+                for palabra in lista_busqueda:
+                    if form.cliente.data.upper() in palabra:
+                        lista.append(palabra)
+                if len(lista) != 0:
+                    ff = True
+                else:
+                    ff = False
+                    msg = "No se encontro nombre del cliente"
+                    # ff habilita la visualizacion del contenido de la variable lista
+                return render_template("cliente.html", form = form, lista = lista, msg = msg , ff = ff)
+        return render_template("cliente.html", form = form, ff = False)
+    flash('Debe estar logueado para acceder')
+    return redirect(url_for('login'))
 
-@app.route('/producto', methods = ('GET', 'POST'))
+
+@app.route("/producto", methods = ('GET', 'POST'))
 def producto():
     """ Funciona junto con la pagina mostrar para listar todos los clientes que compraron un  determinado producto, en
     esta pagina el usuario debe ingresar 3 caracteres que componen el nombre del producto a buscar, como resultado se
     obtendra una lista de posibles productos, en la cual el usuario debe elegir uno de ellos, y al clickear el boton
     seleccionar se redireccionara a la pagina mostrar, en donde se visualizara el listado"""
-    form = MyConsultaProducto()
-    lista_busqueda = archivo.lista_producto("archivos_csv/archivo.csv")
-    ff = False
-    msg = ""
-    if form.validate_on_submit():
-        lista = []
-        if form.producto.data != None:
-            for palabra in lista_busqueda:
-                if form.producto.data.upper() in palabra:
-                    lista.append(palabra)
-            if len(lista) != 0:
-                ff = True
-            else:
-                ff = False
-                msg = "No se encontro nombre del producto"
-                # ff habilita la visualizacion del contenido de la variable lista
-            return render_template('producto.html', form = form, lista = lista, msg = msg , ff = ff)
-    return render_template('producto.html', form = form, ff = False)
+    if session.get("nombre"):
+        form = MyConsultaProducto()
+        lista_busqueda = archivo.lista_producto("archivos_csv/archivo.csv")
+        ff = False
+        msg = ""
+        if form.validate_on_submit():
+            lista = []
+            if form.producto.data != None:
+                for palabra in lista_busqueda:
+                    if form.producto.data.upper() in palabra:
+                        lista.append(palabra)
+                if len(lista) != 0:
+                    ff = True
+                else:
+                    ff = False
+                    msg = "No se encontro nombre del producto"
+                    # ff habilita la visualizacion del contenido de la variable lista
+                return render_template('producto.html', form = form, lista = lista, msg = msg , ff = ff)
+        return render_template('producto.html', form = form, ff = False)
+    flash('Debe estar logueado para acceder')
+    return redirect(url_for('login'))
 
-@app.route('/mostrar', methods=('GET', 'POST'))
+@app.route("/mostrar", methods=('GET', 'POST'))
 def mostrar():
     """En base al nombre seleccionado en las paginas cliente o producto, se genera el listado correspondiente, el mismo
     se visualizara en esta misma pagina"""
-    if  request.method == 'POST':
-        lista = []
-        msg = ""
-        msg2 = ""
-        msg3 = ""
-        listado = archivo.leer("archivos_csv/archivo.csv")
-        seleccion = request.form['selecc']
-        for l in listado:
-            if seleccion == l['CLIENTE']:
-                msg = "Listado de todos los productos que compro un Cliente"
-                msg2 = seleccion
-                msg3 = "cliente"
-                lista.append(l)
-            elif seleccion == l['PRODUCTO']:
-                lista.append(l)
-                msg = "Listado de clientes que comparon un producto"
-                msg2 = seleccion
-                msg3 = "producto"
-                # ff habilita la visualizacion del contenido de la variable lista junto con msg y msg3
-                # la variable msg3 es utilizada para volver al html en donde se origino la solicitud
-        return render_template('mostrar.html',  lista = lista, ff = True, msg = msg, msg2 = msg2, msg3 = msg3)
-    return render_template('mostrar.html')
+    if session.get("nombre"):
+        if request.method == 'POST':
+            lista = []
+            msg = ""
+            msg2 = ""
+            msg3 = ""
+            listado = archivo.leer("archivos_csv/archivo.csv")
+            seleccion = request.form['selecc']
+            for l in listado:
+                if seleccion == l['CLIENTE']:
+                    msg = "Listado de todos los productos que compro un Cliente"
+                    msg2 = seleccion
+                    msg3 = "cliente"
+                    lista.append(l)
+                elif seleccion == l['PRODUCTO']:
+                    lista.append(l)
+                    msg = "Listado de clientes que comparon un producto"
+                    msg2 = seleccion
+                    msg3 = "producto"
+                    # ff habilita la visualizacion del contenido de la variable lista junto con msg y msg3
+                    # la variable msg3 es utilizada para volver al html en donde se origino la solicitud
+            return render_template('mostrar.html', lista=lista, ff=True, msg=msg, msg2=msg2, msg3=msg3)
+        return render_template('mostrar.html')
+    flash('Debe estar logueado para acceder')
+    return redirect(url_for('login'))
 
-@app.route('/mejores_clientes', methods = ('GET', 'POST'))
+
+@app.route("/mejores_clientes", methods = ('GET', 'POST'))
 def mejores_clientes():
     """En esta pagina se generara y visualizara el listado de los clientes que realizaron la mayor cantidad de compras,
      para realizar esto se necesita:
@@ -203,31 +221,34 @@ def mejores_clientes():
       Primero se genera una lista que contiene el nombre del cliente y cuanto gasto, y luego con ella se genera otra
       lista con la cantidad de items que pide el usuario, se la ordena para que los valores sean visualizados en forma
       descendente."""
-    form = MyConsulta()
-    if form.validate_on_submit():
-        listado = archivo.leer("archivos_csv/archivo.csv")
-        masgasto = []
-        consulta = []
-        lista_busqueda = archivo.lista_clientes("archivos_csv/archivo.csv")
-        for listcli in lista_busqueda:
-            gastoTotal = 0
-            for clientes in listado:
-                if listcli == clientes['CLIENTE']:
-                    gasto = float(clientes['CANTIDAD']) * float(clientes['PRECIO'])
-                    gastoTotal = gastoTotal + gasto
-            masgasto.append([gastoTotal, listcli])
-        cont = 1
-        masgasto.sort(reverse = True)
-        for datos in masgasto:
-            if cont <= form.cantidad.data:
-                consulta.append(datos)
-                cont = cont + 1
-        consulta.sort(reverse = True)
-        ## ver variables fc y ff si se usan
-        return render_template('mejores_clientes.html', form = form, fc = True, consulta = consulta, msg2 = "Importe")
-    return render_template('mejores_clientes.html', form = form)
+    if session.get("nombre"):
+        form = MyConsulta()
+        if form.validate_on_submit():
+            listado = archivo.leer("archivos_csv/archivo.csv")
+            masgasto = []
+            consulta = []
+            lista_busqueda = archivo.lista_clientes("archivos_csv/archivo.csv")
+            for listcli in lista_busqueda:
+                gastoTotal = 0
+                for clientes in listado:
+                    if listcli == clientes['CLIENTE']:
+                        gasto = float(clientes['CANTIDAD']) * float(clientes['PRECIO'])
+                        gastoTotal = gastoTotal + gasto
+                masgasto.append([gastoTotal, listcli])
+            cont = 1
+            masgasto.sort(reverse = True)
+            for datos in masgasto:
+                if cont <= form.cantidad.data:
+                    consulta.append(datos)
+                    cont = cont + 1
+            consulta.sort(reverse = True)
+            ## ver variables fc y ff si se usan
+            return render_template('mejores_clientes.html', form = form, fc = True, consulta = consulta, msg2 = "Importe")
+        return render_template('mejores_clientes.html', form = form)
+    flash('Debe estar logueado para acceder')
+    return redirect(url_for('login'))
 
-@app.route('/mas_vendidos', methods = ('GET', 'POST'))
+@app.route("/mas_vendidos", methods = ('GET', 'POST'))
 def mas_vendidos():
     """En esta pagina se generara y visualizara el listado de los productos de mayor venta para realizar esto se
     necesita:
@@ -239,29 +260,32 @@ def mas_vendidos():
           Primero se genera una lista que contiene el nombre del producto, cantidad vendida y codigo, y luego con ella
           se genera otra lista con la cantidad de items que pide el usuario, se la ordena para que los valores sean
           visualizados en forma descendente."""
-    form = MyConsulta()
-    if form.validate_on_submit():
-        listado = archivo.leer("archivos_csv/archivo.csv")
-        masvendio = []
-        consulta = []
-        lista_busqueda = archivo.lista_producto("archivos_csv/archivo.csv")
-        for listcli in lista_busqueda:
-            cant = 0
-            codigo = 0
-            for clientes in listado:
-                if listcli == clientes['PRODUCTO']:
-                     cant = cant + float(clientes['CANTIDAD'])
-                     codigo = clientes['CODIGO']
-            masvendio.append([int(cant), listcli, codigo])
-        cont = 1
-        masvendio.sort(reverse = True)
-        for datos in masvendio:
-            if cont <= form.cantidad.data:
-                consulta.append(datos)
-                cont = cont + 1
-        consulta.sort(reverse = True)
-        return render_template('mas_vendidos.html', form = form, fc = True, consulta = consulta, msg2 = "Cantidad")
-    return render_template('mas_vendidos.html', form = form)
+    if session.get("nombre"):
+        form = MyConsulta()
+        if form.validate_on_submit():
+            listado = archivo.leer("archivos_csv/archivo.csv")
+            masvendio = []
+            consulta = []
+            lista_busqueda = archivo.lista_producto("archivos_csv/archivo.csv")
+            for listcli in lista_busqueda:
+                cant = 0
+                codigo = 0
+                for clientes in listado:
+                    if listcli == clientes['PRODUCTO']:
+                         cant = cant + float(clientes['CANTIDAD'])
+                         codigo = clientes['CODIGO']
+                masvendio.append([int(cant), listcli, codigo])
+            cont = 1
+            masvendio.sort(reverse = True)
+            for datos in masvendio:
+                if cont <= form.cantidad.data:
+                    consulta.append(datos)
+                    cont = cont + 1
+            consulta.sort(reverse = True)
+            return render_template('mas_vendidos.html', form = form, fc = True, consulta = consulta, msg2 = "Cantidad")
+        return render_template('mas_vendidos.html', form = form)
+    flash('Debe estar logueado para acceder')
+    return redirect(url_for('login'))
 
 @app.errorhandler(404)
 def no_encontrado(e):

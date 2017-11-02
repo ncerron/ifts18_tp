@@ -29,14 +29,16 @@
             </div>
         </div>
     </form >
-    {% if msg3=="cliente" %}
+ {% if msg3=="cliente" %}
         <form method="GET" action="/cliente">
-         <input type="submit" value="Volver" class="btn btn-clientes">
+         <input type="submit" value="Volver" class="btn btn-clientes" onClick="window.location.reload()">
         </form>
      {% elif msg3=="producto" %}
         <form method="GET" action="/producto">
-        <input type="submit" value="Volver" class="btn btn-clientes">
+        <input type="submit" value="Volver" class="btn btn-clientes" onClick="window.location.reload()">
         </form>
+
     {% endif %}
 </div>
 {% endblock %}
+}

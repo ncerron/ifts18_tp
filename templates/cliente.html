@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+
  {% block page_content %}
 <div id="wrapper" class="container">
     <form method="POST" action="/cliente">
@@ -34,10 +35,10 @@
         <br>
         <br>
         {{form.submit_selec(class="btn btn-clientes")}}
-        {% else %}
-               <p style="color:goldenrod; text-align:left; margin-left:15px;"> {{ msg }} </p>
-        {% endif %}
-    </form>
+{% else %}
+           <p style="color:goldenrod; text-align:left; margin-left:15px;"> {{ msg }} </p>
+{% endif %}
+        </form>
 </div>
 {% endblock %}
 
