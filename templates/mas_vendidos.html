@@ -2,7 +2,7 @@
  {% block page_content %}
 <div id="wrapper" class="container">
     <form method="POST" action="/mas_vendidos">
-        {{ form.csrf_token }}
+         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
         <fieldset>
             <legend class="legend"><h4> Listar los productos mas vendidos</h4></legend>
             <div class="form-group">
@@ -29,18 +29,21 @@
             <h3 class="titulo-consulta"> {{consulta[0][1]}}</h3>
             <table class="table">
                 <tr>
-                    <th>Codigo</th>
-                    <th>Producto</th>
-                    <th>{{msg2}}</th>
+                    <th align="center">CODIGO</th>
+                    <th align="center">PRODUCTO</th>
+                    <th align="center" >{{msg2}}</th>
                 </tr>
                 {% for cl in consulta %}
                 <tr>
-                    <td>{{ cl[2] }}</td>
-                    <td>{{ cl[1] }}</td>
-                    <td>{{ cl[0] }}</td>
+                    <td align="center">{{ cl[0] }}</td>
+                    <td align="center">{{ cl[1] }}</td>
+                    <td align="center">{{ cl[2] }}</td>
                 </tr>
                 {% endfor %}
             </table>
+            <div style="text-align: right" >
+             <a href="/bajar-archivo/" style="color: black">Descargá la consulta</a>
+            </div>
             {%endif%}
         </div>
     </form>

@@ -1,4 +1,4 @@
-Estructura de Datos - Parcial
+Estructura de Datos / Paradigma - Parcial/Final
 
 #  Informe
 
@@ -22,3 +22,7 @@ La aplicación esta compuesta por los siguientes archivos: archivo.py, formulari
 *archivo formulario.py* se creará  las distintas clases de los formularios que se usarán en la aplicación.
 
 *principal.py* es donde se incia la aplicación,  aquí se generan las distintas páginas html según las solicitudes que ingrese el usuario, y dependiendo de estas solicitudes, se realizarán validaciones o manejo de datos a través de las distintas consultas. 
+
+Para la presentacion de la aplicacicion al examen Final se agrega:
+- la funcion cambio de contraseña de los usuarios registrados, para ello se crea nueva html, y la clase MyContrasenia para definir los campos.
+- la posibilidad de generar un archivo de salida por cada una de las consultas, con el formato resultados_YYYYMMDD_HHmmSS.csv

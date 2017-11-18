@@ -15,6 +15,7 @@ def lista_clientes(archivo1) :
                lista_consulta.append(l['CLIENTE'])
         return lista_consulta
 
+
 def lista_producto(archivo1):
     """funcion que lee  un archivo y retorna una lista de Productos sin duplicados"""
     with open(archivo1) as archivo:
@@ -26,6 +27,7 @@ def lista_producto(archivo1):
                 lista_consulta.append(l['PRODUCTO'])
         return lista_consulta
 
+
 def leer(archivo1) :
     """lee arhivo y lo guarda como un diccionario el cual es asignado a la variable listadic, se retorna la misma"""
     with open(archivo1) as archivo :
@@ -33,12 +35,61 @@ def leer(archivo1) :
          listadic = list(arch_csv)
          return listadic
 
+
+def grabar_lista(archivo, lista) :
+    """"se guarda todo el diccionario en archivo csv, sobreescribiendo el existente, se utiliza
+     en la funcion cambio_contrasenia"""
+    with open(archivo,  "w") as salidacsv:
+        campos = ['login', 'usuario']
+        writer = csv.DictWriter(salidacsv, fieldnames=campos)
+        writer.writeheader()
+        for datos in lista:
+            writer.writerow(datos)
+
+
+def grabar_consulta(lista, msg, msg2) :
+    """"se guarda el resultado de la consulta de la funcion mostrar en el archivo consulta.csv"""
+    with open("archivos_csv/consulta.csv",  "w") as salidacsv:
+        salidacsv.write(msg + '\n')
+        salidacsv.write('\n')
+        salidacsv.write(msg2 + '\n')
+        campos = ['CODIGO', 'PRODUCTO','CLIENTE', 'CANTIDAD', 'PRECIO']
+        writer = csv.DictWriter(salidacsv, fieldnames=campos)
+        writer.writeheader()
+        for datos in lista:
+            writer.writerow(datos)
+
+
+def grabar_consulta_mjor_cliente(lista) :
+    """"se guarda el resultado de la consulta del la funcion mejores_clientes en el archivo consulta.csv"""
+    with open("archivos_csv/consulta.csv",  "w") as salidacsv:
+        salidacsv.write("Lista los Clientes que mas compraron" + '\n')
+        salida = csv.writer(salidacsv)
+        salidacsv.write('\n')
+        salidacsv.write(lista[0][0] + '\n')
+        salida.writerow (["CLIENTE", "IMPORTE"])
+        salida.writerows(lista)
+
+
+def grabar_consulta_mas_vendidos(lista) :
+    """"se guarda el resultado de la consulta de la funcion mas_vendidos en el archivo consulta.csv"""
+    with open("archivos_csv/consulta.csv",  "w") as salidacsv:
+        salidacsv.write("Listar los productos mas vendidos" + '\n')
+        salida = csv.writer(salidacsv)
+        salidacsv.write('\n')
+        salidacsv.write(lista[0][1] + '\n')
+        salida.writerow (["CODIGO", "PRODUCTO", "CANTIDAD"])
+        salida.writerows(lista)
+
+
 def grabar(archivo, dato1, dato2) :
-    """"se guarda los dato1 y dato2 al archivo en formato de diccionario"""
+    """"se guarda los dato1 y dato2 al archivo en formato de diccionario, se utiliza para agregar
+    usuarios"""
     with open(archivo,  "a") as salidacsv:
         campos = ['login', 'usuario']
         salida = csv.DictWriter(salidacsv,lineterminator='\n', fieldnames = campos)
         salida.writerow({'login': dato1, 'usuario': dato2})
+
 
 def validar(archivo) :
     """lee el archivo asignando en la variable listadic la informacion del archivo, para poder ser validados

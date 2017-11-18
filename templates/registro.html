@@ -3,7 +3,7 @@
 
 <div id="wrapper" class="container">
     <form method="POST" action="/registro">
-        {{ form.csrf_token }}
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
         <fieldset>
             <legend class="legend" ><h4>Registro</h4></legend>
             <div class="col-md-12" align="left">

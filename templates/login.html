@@ -3,7 +3,7 @@
  {% block page_content %}
 <div id="wrapper" class="container">
     <form method="POST" action="/login">
-        {{ form.csrf_token }}
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
         <fieldset>
             <legend class="legend"><h4>Login</h4></legend>
             <!--mensaje   -->

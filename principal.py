@@ -1,12 +1,17 @@
 #!/usr/bin/env python
 from flask_bootstrap import Bootstrap
-from flask import Flask, render_template,session, redirect, url_for, request, flash
-from formulario import MyLogin, MyRegistro, MyConsultaCliente, MyConsultaProducto, MyConsulta
+from flask import Flask, render_template,session, redirect, url_for, request, flash, send_file
+from formulario import MyLogin, MyRegistro, MyConsultaCliente, MyConsultaProducto, MyConsulta, MyContrasenia
 import archivo
+from flask_wtf import CSRFProtect
+from datetime import datetime
+
 
 app = Flask(__name__)
 app.config["SECRET_KEY"] = "String dificil de adivinar"
 bootstrap = Bootstrap(app)
+Csrf = CSRFProtect(app)
+
 
 @app.route("/logout")
 def logout():
@@ -38,11 +43,7 @@ def login():
             if l['usuario'] == form2.usu.data.strip():
                 if l['login'] == form2.passw.data.strip():
                     session["nombre"] = form2.usu.data.strip()
-                    ## se establece un nombre a la sesion
-                    if session["nombre"] == "admin":
-                        return redirect(url_for('ventas'))
-                    else:
-                        return redirect(url_for('usuario'))
+                    return redirect(url_for('ventas'))
                 else:
                     form2.passw.data = ""
                     # a traves de la variable msj, en html se informa que se verifique la contraseña
@@ -178,6 +179,7 @@ def producto():
     flash('Debe estar logueado para acceder')
     return redirect(url_for('login'))
 
+
 @app.route("/mostrar", methods=('GET', 'POST'))
 def mostrar():
     """En base al nombre seleccionado en las paginas cliente o producto, se genera el listado correspondiente, el mismo
@@ -203,6 +205,7 @@ def mostrar():
                     msg3 = "producto"
                     # ff habilita la visualizacion del contenido de la variable lista junto con msg y msg3
                     # la variable msg3 es utilizada para volver al html en donde se origino la solicitud
+            archivo.grabar_consulta(lista,msg, msg2)
             return render_template('mostrar.html', lista=lista, ff=True, msg=msg, msg2=msg2, msg3=msg3)
         return render_template('mostrar.html')
     flash('Debe estar logueado para acceder')
@@ -213,7 +216,7 @@ def mostrar():
 def mejores_clientes():
     """En esta pagina se generara y visualizara el listado de los clientes que realizaron la mayor cantidad de compras,
      para realizar esto se necesita:
-      l- a cantidad de clientes que se quiere mostrar, el usuario ingresara este dato.
+      l- la cantidad de clientes que se quiere mostrar, el usuario ingresara este dato.
       2- la informacion de las ventas se obtiene del archivo archivo.csv, el cual sera leido y asignados los datos en la
          variable listado.
       3- la  variable lista_busqueda en la cual se asigna el listado de clientes sin duplicados que contiene el archivo
@@ -234,16 +237,16 @@ def mejores_clientes():
                     if listcli == clientes['CLIENTE']:
                         gasto = float(clientes['CANTIDAD']) * float(clientes['PRECIO'])
                         gastoTotal = gastoTotal + gasto
-                masgasto.append([gastoTotal, listcli])
+                masgasto.append([listcli, gastoTotal])
             cont = 1
-            masgasto.sort(reverse = True)
+            masgasto.sort(key=lambda c: c[1], reverse=True)
+            print(masgasto)
             for datos in masgasto:
                 if cont <= form.cantidad.data:
                     consulta.append(datos)
                     cont = cont + 1
-            consulta.sort(reverse = True)
-            ## ver variables fc y ff si se usan
-            return render_template('mejores_clientes.html', form = form, fc = True, consulta = consulta, msg2 = "Importe")
+            archivo.grabar_consulta_mjor_cliente(consulta)
+            return render_template('mejores_clientes.html', form = form, fc = True, consulta = consulta, msg2 = "IMPORTE")
         return render_template('mejores_clientes.html', form = form)
     flash('Debe estar logueado para acceder')
     return redirect(url_for('login'))
@@ -274,28 +277,62 @@ def mas_vendidos():
                     if listcli == clientes['PRODUCTO']:
                          cant = cant + float(clientes['CANTIDAD'])
                          codigo = clientes['CODIGO']
-                masvendio.append([int(cant), listcli, codigo])
+                masvendio.append([codigo, listcli,int(cant) ])
             cont = 1
-            masvendio.sort(reverse = True)
+            masvendio.sort(key=lambda c: c[2], reverse=True)
             for datos in masvendio:
                 if cont <= form.cantidad.data:
                     consulta.append(datos)
                     cont = cont + 1
-            consulta.sort(reverse = True)
-            return render_template('mas_vendidos.html', form = form, fc = True, consulta = consulta, msg2 = "Cantidad")
+            archivo.grabar_consulta_mas_vendidos(consulta)
+            return render_template('mas_vendidos.html', form = form, fc = True, consulta = consulta, msg2 = "CANTIDAD")
         return render_template('mas_vendidos.html', form = form)
     flash('Debe estar logueado para acceder')
     return redirect(url_for('login'))
+
 
 @app.errorhandler(404)
 def no_encontrado(e):
     """en caso de error se muestra la pagina 404.html"""
     return render_template('404.html'), 404
 
+
 @app.errorhandler(500)
 def error_interno(e):
     """en caso de error se muestra la pagina 500.html"""
     return render_template('500.html'), 500
+
+
+@app.route("/cambio-contrasenia", methods = ('GET', 'POST'))
+def cambio_contrasenia():
+    """cambio de contraseña del usuario, se guarda en variable el diccionario, para
+    poder asignarle el cambio de contraseña, y luego se guarda en archivo la modificacion realizada"""
+    if session.get("nombre"):
+        form = MyContrasenia()
+        if form.validate_on_submit():
+            usuarios = archivo.leer("archivos_csv/passws.csv")
+            if form.passw1.data.strip() == form.passw.data.strip():
+                for l in usuarios :
+                    if l['usuario'] ==  session["nombre"] :
+                        l['login'] = form.passw1.data.strip()
+                archivo.grabar_lista("archivos_csv/passws.csv", usuarios)
+                return render_template('cambio-contrasenia.html', form=form, msj="ok")
+            else:
+                return render_template('cambio-contrasenia.html', form=form, msj="mal")
+        return render_template('cambio-contrasenia.html', form=form)
+    flash('Debe estar logueado para acceder')
+    return redirect(url_for('login'))
+
+
+@app.route('/bajar-archivo/')
+def baja_archivo():
+    """funcion que permite desde la web bajar el archivo consulta, asignandole un nombre
+    con determinado formato"""
+    if session.get("nombre"):
+      nombre_arch = "resultados_" + datetime.now().strftime("%Y%m%d_%H%M%S") + ".csv"
+      return send_file('archivos_csv/consulta.csv', as_attachment=True, attachment_filename=nombre_arch, cache_timeout=6)
+    flash('Debe estar logueado para acceder')
+    return redirect(url_for('login'))
 
 if __name__ == "__main__":
     app.run()

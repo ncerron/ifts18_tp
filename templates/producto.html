@@ -3,16 +3,9 @@
  {% block page_content %}
 <div id="wrapper" class="container">
     <form method="POST" action="/producto">
-        {{ form.csrf_token }}
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
         <fieldset>
-            <legend class="legend"><h4> Listado de clientes que comparon un producto</h4></legend>
-            <div class="col-md-12" align="left">
-                {% if msj == "ok" %}
-                <h4> <span class="label label-warning">Verifique login</span> </h4>
-                {% elif  msj == " " %}
-                <h4> <span class="label label-warning">Usuario no encontrado</span> </h4>
-                {% endif %}
-            </div>
+            <legend class="legend"><h4> Listado de clientes que comparon un Producto</h4></legend>
             <div class="form-group">
                 <div class="col-md-12">
                     <div class="row">
@@ -22,7 +15,7 @@
                                 <span class="input-group-btn">{{form.submit(class="btn btn-clientes")}}</span>
                             </div>
                             {% for message in form.producto.errors %}
-                                    <span style="color:goldenrod;"> {{ message }} </span>
+                                    <p style="color:goldenrod;"> {{ message }} </p>
                             {% endfor %}
                         </div>
                     </div>
@@ -32,18 +25,21 @@
     </form>
     {% if ff %}
     <form method="POST" action="/mostrar">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
         <br>
         <h4>Seleccione un Producto</h4>
         {% for l in lista %}
-             <div class="radio">
-                  <label style="font-size:14px"><input type="radio" name="selecc" value="{{l}}">{{l}}</label>
-             </div>
+            <div class="radio">
+              <label style="font-size:14px"><input type="radio" name="selecc" value="{{l}}" checked="checked" >{{l}}</label>
+            </div>
         {% endfor %}
         <br>
         <br>
-       {{form.submit_selec(class="btn btn-clientes")}}
+        {{form.submit_selec(class="btn btn-clientes")}}
+    {% else %}
+          <p style="color:goldenrod; text-align:left; margin-left:15px;"> {{ msg }} </p>
+        {% endif %}
     </form>
- {% endif %}
 </div>
 {% endblock %}
 

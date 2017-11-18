@@ -2,7 +2,7 @@
  {% block page_content %}
 <div id="wrapper" class="container">
     <form method="POST" action="/mejores_clientes">
-        {{ form.csrf_token }}
+         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
         <fieldset>
             <legend class="legend"><h4> Listar los Clientes que mas compraron</h4></legend>
             <div class="form-group">
@@ -25,23 +25,28 @@
         <br>
         <br>
         <div class="table-responsive">
-            <h3 class="titulo-consulta"> {{consulta[0][1]}}</h3>
+            <h3 class="titulo-consulta"> {{consulta[0][0]}}</h3>
             <table class="table">
                 <tr>
-                    <th>Cliente</th>
-                    <th>{{msg2}}</th>
+                    <th align="center" >CLIENTE</th>
+                    <th align="center">{{msg2}}</th>
                 </tr>
                 {% for cl in consulta %}
                 <tr>
-                    <td>{{ cl[1] }}</td>
-                    <td>{{ cl[0] }}</td>
+                    <td align="center">{{ cl[0] }}</td>
+                    <td align="center">{{ cl[1] }}</td>
                 </tr>
-
                 {% endfor %}
             </table>
+            <br>
+            <div style="text-align: right" >
+             <a href="/bajar-archivo/" style="color: black">Descargá la consulta</a>
+            </div>
             {%endif%}
         </div>
     </form>
+
+
 </div>
 {% endblock %}
 

@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+ {% block page_content %}
+<div id="wrapper" class="container">
+    <form method="POST" action="/cambio-contrasenia">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+        <fieldset>
+            <legend class="legend"><h4>Cambio de contraseña</h4></legend>
+            <!--mensaje   -->
+            <div class="col-md-12" align="left">
+                {% if msj == "ok" %}
+                <h4> <span class="label label-warning">El cambio se realizó correctamente</span> </h4>
+                {% elif  msj == "mal" %}
+                <h4> <span class="label label-warning">Verifique los datos ingresados</span> </h4>
+                {% endif %}
+            </div>
+            <div class="form-group">
+                <div class="col-md-6">
+                    <label class="control-label">{{ form.passw.label }}</label>
+                    {{ form.passw(class="form-control" ) }}
+                    {% for message in form.passw.errors %}
+                         <span style="color:goldenrod;"> {{ message }} </span>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-md-6">
+                    <label class="control-label">{{ form.passw1.label }}</label>
+                    {{ form.passw1(class="form-control" ) }}
+                    {% for message in form.passw1.errors %}
+                          <span style="color:goldenrod;"> {{ message }} </span>
+                    {% endfor %}
+                    <br>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-md-12">
+                    {{ form.submit(class="btn btn-lg btn-block")}}
+                </div>
+            </div>
+        </fieldset>
+    </form>
+</div>
+
+
+{% endblock %}

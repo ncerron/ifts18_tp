@@ -37,3 +37,9 @@ class MyConsulta(FlaskForm):
      principal.py """
     submit = SubmitField("Aceptar")
     cantidad = IntegerField('Cantidad de items a mostrar', [validators.data_required(message = "Debe ingresar un numero entero")])
+
+class MyContrasenia(FlaskForm):
+    """se definee campos para el formulario en la funcion cambio contrasenia """
+    passw = PasswordField('Contraseña', [validators.data_required(message = "Debe ingresar una contraseña")])
+    passw1 = PasswordField('Repetir Contraseña', [validators.data_required(message = "Debe ingresar una contraseña")])
+    submit = SubmitField("Enviar")

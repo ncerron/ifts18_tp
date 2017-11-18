@@ -21,7 +21,7 @@
         </div>
         <div class="navbar-collapse collapse">
             <ul class="nav navbar-nav">
-                {%  if 'admin' == session['nombre'] %}
+                {%  if 'nombre' in session %}
                 <li><a href="/users">Usuarios</a></li>
                 <li><a href="/ventas">Ultimas ventas</a></li>
                 <li class="nav-item dropdown">
@@ -33,16 +33,18 @@
                         <li><a class="dropdown-item" href="/mas_vendidos">Productos más vendidos</a></li>
                     </ul>
                 </li>
-                {% elif 'nombre' not in session %}
+            </ul>
+
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="/cambio-contrasenia">Contraseña</a></li>
+                <li><a href="/logout">Logout </a></li>
+            </ul>
+            {% elif 'nombre' not in session %}
+            <ul class="nav navbar-nav">
                 <li><a href="/login">Login</a></li>
                 <li><a href="/registro">Registro</a></li>
-                {% endif %}
-                </ul>
-                <ul class="nav navbar-nav navbar-right">
-                    {%  if 'nombre' in session %}
-                    <li><a href="/logout">Logout </a></li>
-                    {% endif %}
-                </ul>
+            </ul>
+            {% endif %}
         </div>
     </div>
 </div>
@@ -53,9 +55,7 @@
     {% endblock %}
 </div>
 {% endblock %}
-
 {% block scripts %}
 {{ super() }}
-
 {% endblock %}
 

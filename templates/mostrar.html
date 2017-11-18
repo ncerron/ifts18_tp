@@ -2,6 +2,7 @@
 {% block page_content %}
 <div id="wrapper" class="container">
     <form method="POST" action="/mostrar">
+         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
         <h4>{{msg}}</h4>
         <hr>
         <br>
@@ -10,35 +11,40 @@
             <div class="col-md-12">
                 <table class="table">
                     <tr>
-                        <th>Codigo</th>
-                        <th>Cliente</th>
-                        <th>Cantidad</th>
-                        <th>Precio</th>
-                        <th>Producto</th>
+                        <th align="center" >CODIGO</th>
+                        <th align="center">PRODUCTO</th>
+                        <th align="center">CLIENTE</th>
+                        <th align="center">CANTIDAD</th>
+                        <th align="center">PRECIO</th>
                     </tr>
                     {% for l2 in lista %}
                     <tr>
-                        <td>{{ l2["CODIGO"]}}</td>
-                        <td>{{ l2["CLIENTE"] }}</td>
-                        <td>{{ l2["CANTIDAD"] }}</td>
-                        <td>{{ l2["PRECIO"] }}</td>
-                        <td>{{ l2["PRODUCTO"] }}</td>
+                        <td align="center">{{ l2["CODIGO"]}}</td>
+                        <td align="center">{{ l2["PRODUCTO"] }}</td>
+                        <td align="center">{{ l2["CLIENTE"] }}</td>
+                        <td align="center">{{ l2["CANTIDAD"] }}</td>
+                        <td align="center">{{ l2["PRECIO"] }}</td>
                     </tr>
                     {% endfor %}
                 </table>
             </div>
         </div>
     </form >
- {% if msg3=="cliente" %}
-        <form method="GET" action="/cliente">
-         <input type="submit" value="Volver" class="btn btn-clientes" onClick="window.location.reload()">
-        </form>
-     {% elif msg3=="producto" %}
-        <form method="GET" action="/producto">
-        <input type="submit" value="Volver" class="btn btn-clientes" onClick="window.location.reload()">
-        </form>
-
+    {% if msg3=="cliente" %}
+    <form method="GET" action="/cliente">
+         <input type="submit" value="Volver" class="btn btn-clientes" onClick="history.go(0)">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+    </form>
+    {% elif msg3=="producto" %}
+         <form method="GET" action="/producto">
+        <input type="submit" value="Volver" class="btn btn-clientes" onClick="history.go(0)">
+             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+         </form>
     {% endif %}
+    <div style="text-align: right" >
+        <a href="/bajar-archivo/" style="color: black">Descargá la consulta</a>
+    </div>
+
 </div>
 {% endblock %}
 }
